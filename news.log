@@ -1,0 +1,19 @@
+2019-08-06 20:50:13,554 - run.py[line:16] - INFO: this is a logger info message
+2019-08-06 20:50:13,554 - run.py[line:17] - WARNING: this is a logger warning message
+2019-08-06 20:50:13,554 - run.py[line:18] - ERROR: this is a logger error message
+2019-08-06 20:50:13,554 - run.py[line:19] - CRITICAL: this is a logger critical message
+2019-08-06 20:50:13,566 - _internal.py[line:122] - INFO:  * Running on http://127.0.0.1:9999/ (Press CTRL+C to quit)
+2019-08-06 20:50:27,730 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:27] "GET / HTTP/1.1" 404 -
+2019-08-06 20:50:27,928 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:27] "GET /favicon.ico HTTP/1.1" 404 -
+2019-08-06 20:50:33,987 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:33] "GET /index HTTP/1.1" 200 -
+2019-08-06 20:50:33,999 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:33] "GET /static/vendor/fontawesome-free/css/all.min.css HTTP/1.1" 200 -
+2019-08-06 20:50:34,001 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/css/sb-admin-2.min.css HTTP/1.1" 200 -
+2019-08-06 20:50:34,009 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/vendor/jquery/jquery.min.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,010 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,013 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/vendor/jquery-easing/jquery.easing.min.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,017 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/js/sb-admin-2.min.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,017 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/vendor/chart.js/Chart.min.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,025 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/js/demo/chart-area-demo.js HTTP/1.1" 200 -
+2019-08-06 20:50:34,026 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:34] "GET /static/js/demo/chart-pie-demo.js HTTP/1.1" 200 -
+2019-08-06 20:50:36,920 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:36] "GET /img/undraw_posting_photo.svg HTTP/1.1" 404 -
+2019-08-06 20:50:37,788 - _internal.py[line:122] - INFO: 127.0.0.1 - - [06/Aug/2019 20:50:37] "GET /static/vendor/fontawesome-free/webfonts/fa-solid-900.woff2 HTTP/1.1" 200 -
