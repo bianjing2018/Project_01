@@ -3,7 +3,7 @@ import numpy as np
 from functools import wraps
 from collections import defaultdict
 from models import NewsChinese
-
+import re, jieba
 
 """python 使用ltp: https://pyltp.readthedocs.io/zh_CN/latest/api.html"""
 CUT_WORD = '../../project_01_data/cut_result'
@@ -17,6 +17,7 @@ def compute_cos_similar(vector1,vector2):
     return up/down
 
 
+# 根据维基百科的分词结果进行分词
 def train_word2vec_model():
     print('进入——---')
     sentences = word2vec.LineSentence(CUT_WORD)
@@ -26,6 +27,14 @@ def train_word2vec_model():
     model.save(SAVE_MODEL)
     print(model.most_similar(['说']))
 
+
+# 处理news_chinese 数据库中的数据
+def dear_news_chinese():
+    datas = NewsChinese.query.filter_by(author='夏文辉')
+    for data in datas:
+        res = re.findall(r'[\d|\w]+', data)
+        res = ' '.join(jieba.lcut(''.join(res)))
+        yield res
 
 # 加载模型
 def load_model():
@@ -85,7 +94,8 @@ def visual_image():
 
 
 if __name__ == '__main__':
-    train_word2vec_model()
+    dear_news_chinese()
+    # train_word2vec_model()
     # model = load_model()
     # solution, seen = get_say_similar_word('足球', model)
     # print(sorted(solution.items(), key=lambda x:x[1][2], reverse=True))
