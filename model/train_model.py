@@ -2,6 +2,8 @@ from gensim.models import Word2Vec, word2vec
 import numpy as np
 from functools import wraps
 from collections import defaultdict
+from models import NewsChinese
+
 
 """python 使用ltp: https://pyltp.readthedocs.io/zh_CN/latest/api.html"""
 CUT_WORD = '../../project_01_data/cut_result'
