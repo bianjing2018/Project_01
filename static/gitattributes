@@ -1,0 +1,4 @@
+*.npy filter=lfs diff=lfs merge=lfs -text
+save_model filter=lfs diff=lfs merge=lfs -text
+save_model2 filter=lfs diff=lfs merge=lfs -text
+save_file/*
