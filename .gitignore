@@ -2,3 +2,4 @@
 *.pyc
 .DS_Store
 news.log
+static/save_file/pickle_model
