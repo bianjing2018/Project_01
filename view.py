@@ -8,7 +8,7 @@ bootstrap = Bootstrap(app)
 from flask import render_template
 from flask import request, redirect, jsonify
 from model.models import NewsChinese
-import logging
+import logging, re
 from train_model import *
 logger = logging.getLogger()
 
@@ -19,3 +19,13 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/topic', methods=['GET', 'POST'])
+def topic():
+    news = request.form.get('news')
+    if news:
+        news = news.split('。')
+        news = [''.join(re.findall(r'[\d|\w]+', new)) for new in news]
+        news = '。'.join(news)
+        sentence_cos_similar, sentences = compute_sentence_ftidf(news)
+        print(sentence_cos_similar)
+    return render_template('index.html')

@@ -15,6 +15,8 @@ import wordcloud
 import matplotlib.pyplot as plt
 import scipy
 from matplotlib.pyplot import imread
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 
 """python 使用ltp: https://pyltp.readthedocs.io/zh_CN/latest/api.html"""
@@ -118,15 +120,21 @@ def compute_sentence_ftidf(sentences):
     c_vector_sentences = c_vector.fit_transform(sentences)
     tf_vector = TfidfTransformer()
     tf_vector_sentences = tf_vector.fit_transform(c_vector_sentences).toarray()  # 生成tfidf
-    for i in range(1, 4):
-        pca = PCA(n_components=i)
-        pca_tf_vector_sentences = pca.fit_transform(tf_vector_sentences)
-        print('pca_tf_vector_sentences valus: {}'.format(i))
-        sentence_cos_similar = [compute_cos_similar(pca_tf_vector_sentences[n],
-                                                    pca_tf_vector_sentences[n+1])
-                                for n in range(pca_tf_vector_sentences.shape[0]-1)]
-        print(sentence_cos_similar)
-        print('*'*200)
+
+    sentence_cos_similar = [compute_cos_similar(tf_vector_sentences[n],
+                                                tf_vector_sentences[n + 1])
+                            for n in range(tf_vector_sentences.shape[0] - 1)]
+    return sentence_cos_similar, sentences
+
+    # for i in range(1, 4):
+    #     pca = PCA(n_components=i)
+    #     pca_tf_vector_sentences = pca.fit_transform(tf_vector_sentences)
+    #     print('pca_tf_vector_sentences valus: {}'.format(i))
+    #     sentence_cos_similar = [compute_cos_similar(pca_tf_vector_sentences[n],
+    #                                                 pca_tf_vector_sentences[n+1])
+    #                             for n in range(pca_tf_vector_sentences.shape[0]-1)]
+    #     print(sentence_cos_similar)
+    #     print('*'*200)
 
 
 def wordcloud_(words):
@@ -141,12 +149,13 @@ def wordcloud_(words):
         random_state=2)
     image_colors = wordcloud.ImageColorGenerator(image_ground)
     wd.fit_words(words)
+    wd.to_file('./static/img/wordcloud.jpg')
     plt.imshow(wd)
     plt.axis("off")
     plt.show()
-    plt.savefig('china_map.jpg')
 
 
+# 可视化
 class DataGraphDisplay:
     def __init__(self, key=None):
         self.model = Word2Vec.load(SAVE_MODEL)
@@ -204,13 +213,14 @@ class DataGraphDisplay:
             random_state=2)
         image_colors = wordcloud.ImageColorGenerator(image_ground)
         wd.fit_words(words)
+        wd.to_file('./static/img/wordcloud.jpg')
         plt.imshow(wd)
         plt.axis("off")
         plt.show()
         plt.imsave()
 
 
-
+# 依存分析
 class ParseDepend:
     def __init__(self, path='../../ltp_data', words=[]):
         self.LTP_DATA_DIR = path  # ltp模型目录的路径
@@ -283,6 +293,7 @@ class ParseDepend:
 # PD.get_main()
 
 
+# 文本分类模型
 class TrainNewsClassModel:
 
     def __init__(self, data=[], target=[]):
@@ -418,12 +429,12 @@ if __name__ == '__main__':
     # for k, v in solution.items():
     #     if v[0] in quanzhong:
     #         word_cloud[v[0]] = quanzhong[v[0]]
-    # # for k, v in sorted(dict(quanzhong).items(), key=lambda x: x[1], reverse=True):
-    # #     if k in seen:
-    # #         words[k] = v
-    # #         i += 1
-    #
-    #
+    # for k, v in sorted(dict(quanzhong).items(), key=lambda x: x[1], reverse=True):
+    #     if k in seen:
+    #         words[k] = v
+    #         i += 1
+
+
     # wordcloud_(word_cloud)
     # print(seen)
     # print(quanzhong)
@@ -442,6 +453,8 @@ if __name__ == '__main__':
     #                        "\n新华社/欧新\n新")
     # dependency_parse(words)
     #
-    # compute_sentence_ftidf("新华社照片，外代，2017年6月7日\n（外代二线）网球——法网：奥斯塔片科晋级半决赛\n6月6日，拉脱维亚选手奥斯塔片科（左）赛后与丹麦选手沃兹尼亚奇握手。"
-    #                        "\n当日，在巴黎举行的法国网球公开赛女单四分之一决赛中，拉脱维亚选手奥斯塔片科2比1战胜丹麦选手沃兹尼亚奇，晋级半决赛。"
-    #                        "\n新华社/欧新\n新")
+    sentence_cos_similar, sentences = compute_sentence_ftidf("新华社照片，外代，2017年6月7日\n（外代二线）网球——法网：奥斯塔片科晋级半决赛\n6月6日，拉脱维亚选手奥斯塔片科（左）赛后与丹麦选手沃兹尼亚奇握手。"
+                           "\n当日，在巴黎举行的法国网球公开赛女单四分之一决赛中，拉脱维亚选手奥斯塔片科2比1战胜丹麦选手沃兹尼亚奇，晋级半决赛。"
+                           "\n新华社/欧新\n新")
+    print(sentence_cos_similar)
+    print(sentences)

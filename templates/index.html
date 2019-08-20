@@ -154,13 +154,14 @@
           </button>
 
           <!-- Topbar Search -->
-          <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+          <form action="/topic" method="post" class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
             <div class="input-group">
-              <input type="text" class="form-control bg-light border-0 small" placeholder="新闻文本..." aria-label="Search" aria-describedby="basic-addon2">
+              <input type="text" name='news' class="form-control bg-light border-0 small" placeholder="新闻文本..." aria-label="Search" aria-describedby="basic-addon2">
               <div class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                  <i class="fas fa-search fa-sm">提交</i>
-                </button>
+                  <input class="btn btn-primary" type="submit" id="submit_button" value="确认上传">
+<!--                <button class="btn btn-primary" type="button">-->
+<!--                  <i class="fas fa-search fa-sm">提交</i>-->
+<!--                </button>-->
               </div>
             </div>
           </form>
