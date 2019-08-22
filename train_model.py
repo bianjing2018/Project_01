@@ -19,6 +19,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 
+
 """python 使用ltp: https://pyltp.readthedocs.io/zh_CN/latest/api.html"""
 CUT_WORD = '../../project_01_data/cut_result' # 所有词的分词结果包含维基百科和新闻数据
 NEWCUTWORD = '../../project_01_data/news_cut_word'  # 新闻分词结果，带标签
@@ -29,12 +30,27 @@ SAVE_MODEL_NB = './static/save_file/save_mode_nb'
 
 # 计算向量间的余弦相似度
 def compute_cos_similar(vector1,vector2):
-    vector1 = np.array(vector1)
-    vector2 = np.array(vector2)
-    num = np.sum(vector1  * vector2)
-    denom = np.linalg.norm(vector1) * np.linalg.norm(vector2)
-    cos = num / denom
-    return 0.5 + 0.5 * cos
+    # cos = cosine_similarity([vector1, vector2])
+    # vector1 = np.array(vector1)
+    # vector2 = np.array(vector2)
+    # num = np.sum(vector1  * vector2)
+    # vector1_mo = np.sqrt(np.sum(np.square(vector1)))
+    # vector2_mo = np.sqrt(np.sum(np.square(vector2)))
+    # denom = vector1_mo * vector2_mo
+    # res = (num / denom)
+    dot_product = 0.0
+    normA = 0.0
+    normB = 0.0
+    for a, b in zip(vector1, vector2):
+        dot_product += a * b
+        normA += a ** 2
+        normB += b ** 2
+    if normA == 0.0 or normB == 0.0:
+        return 0
+    else:
+        return round(dot_product / ((normA ** 0.5) * (normB ** 0.5)) * 100, 2)
+    # return cos
+
 
 
 # 根据维基百科的分词结果进行分词
@@ -109,11 +125,11 @@ def get_say_similar_word(key='说', model=None):
 
 # 计算输入文本中的句子之间的余弦相似度
 def compute_sentence_ftidf(sentences):
-    sentences = sentences.split('。') # 对输入语句进行句号分词
+    # sentences = sentences.split('。') # 对输入语句进行句号分词
     result = []
     for sentence in sentences:
         sentence = ' '.join(re.findall(r'[\d|\w]+', sentence))
-        sentence = ' '.join(jieba.lcut(sentence))
+        sentence = ' '.join([s for s in jieba.lcut(sentence) if s != 'n'])
         result.append(sentence)
     sentences = result
     c_vector = CountVectorizer()
@@ -124,7 +140,9 @@ def compute_sentence_ftidf(sentences):
     sentence_cos_similar = [compute_cos_similar(tf_vector_sentences[n],
                                                 tf_vector_sentences[n + 1])
                             for n in range(tf_vector_sentences.shape[0] - 1)]
-    return sentence_cos_similar, sentences
+    max_index = {'max_index': i + 1 for i, s in enumerate(sentence_cos_similar) if s > 0.5}
+    max_index = max_index['max_index'] + 1
+    return sentence_cos_similar, sentences[: max_index]
 
     # for i in range(1, 4):
     #     pca = PCA(n_components=i)
@@ -157,7 +175,7 @@ def wordcloud_(words):
 
 # 可视化
 class DataGraphDisplay:
-    def __init__(self, key=None):
+    def __init__(self, key='说'):
         self.model = Word2Vec.load(SAVE_MODEL)
         self.key = key
 
@@ -202,7 +220,6 @@ class DataGraphDisplay:
         for k, v in solution.items():
             if v[0] in quanzhong:
                 words[v[0]] = quanzhong[v[0]]
-
         image_ground = imread('./static/img/chinamap.jpg')
         wd = wordcloud.WordCloud(
             font_path='./static/DejaVuSans.ttf',
@@ -229,7 +246,15 @@ class ParseDepend:
 
     def deal_sentence(self, sentence):
         # 处理句子，并且分词
-        pass
+        sentence = sentence.split('。')
+        sentence = [''.join(re.findall(r'[\d|\w]+', sen)) for sen in sentence]
+        return sentence
+
+    def my_cut(self, sentences):
+        words = []
+        for s in sentences:
+            words.extend(jieba.lcut(s))
+        return words
 
     def get_word_xing(self, words):
         # 词性标注
@@ -238,7 +263,7 @@ class ParseDepend:
         postagger.load(pos_model_path)  # 加载模型
         # words = ['元芳', '你', '怎么', '看']  # 分词结果
         postags = postagger.postag(words)  # 词性标注
-        print('\t'.join(postags))
+        # print('\t'.join(postags))
         postagger.release()  # 释放模型
         return postags
 
@@ -251,16 +276,16 @@ class ParseDepend:
         # words = ['元芳', '你', '怎么', '看']
         # postags = ['nh', 'r', 'r', 'v']
         arcs = parser.parse(words, postags)  # 句法分析
-        print("\t".join("%d:%s" % (arc.head, arc.relation) for arc in arcs))
+        # print("\t".join("%d:%s" % (arc.head, arc.relation) for arc in arcs))
         parser.release()  # 释放模型
         self.arcs = arcs
 
-    def get_HED(self):
+    def get_HED(self, words):
         # get HED
         root = None
         for i, arc in enumerate(self.arcs):
             if arc.relation == 'HED' and arc.head == 0:
-                root = (i, arc.relation, self.words[i])
+                root = (i, arc.relation, words[i])
         return root
 
     def get_word(self, head, wtype):
@@ -271,21 +296,41 @@ class ParseDepend:
         return 'nan', 'nan'
 
     def get_main(self):
-        self.get_word_depend(self.words)
-        root = self.get_HED()
-        if root:
-            hed = root[2] # 谓语
-            sbv, sbv_i = self.get_word(root[0], 'SBV')  # 获取主语 root[0] 为谓语动词的索引值
-            # vob, vob_i = self.get_word(root[0], 'VOB')  # 获取宾语
-            # fob, fob_i = self.get_word(root[0], 'FOB')  # 后置宾语
-            # adv, adv_i = self.get_word(root[0], 'ADV')  # 副词做状语
-            # pob, pod_i = self.get_word(adv_i, 'POB')
+        result = {}
+        dgd = DataGraphDisplay()
+        solution, seen, quanzhong = dgd.get_say_similar_word()  # 获取说相似性较高的词
+        solution_v = []
+        model = Word2Vec.load(SAVE_MODEL)
+        for k, v in solution.items():
+            if v[0] not in solution_v:
+                solution_v.append(v[0])
+        print(solution_v)
+        for i, word in enumerate(self.words):
+            self.get_word_depend(word.split(' '))
+            root = self.get_HED(word.split(' '))
+            if root:
+                hed = root[2] # 谓语
+                for w in solution_v:
+                    print(model.similarity(w, hed))
+                    if model.similarity(w, hed) > 0.5:
+                        solution_v.append(hed)
+                        break
+                if hed not in solution_v: # 判断下当前找到的谓语动词是否是 说相似的
+                    continue
+                sbv, sbv_i = self.get_word(root[0], 'SBV')  # 获取主语 root[0] 为谓语动词的索引值
+                # vob, vob_i = self.get_word(root[0], 'VOB')  # 获取宾语
+                # fob, fob_i = self.get_word(root[0], 'FOB')  # 后置宾语
+                # adv, adv_i = self.get_word(root[0], 'ADV')  # 副词做状语
+                # pob, pod_i = self.get_word(adv_i, 'POB')
 
-            zhuyu = [sbv]
-            weiyu = [hed]
-            self.words.remove(sbv)
-            self.words.remove(hed)
-            print('{}  {}  {}'.format(' '.join(zhuyu), ' '.join(weiyu), ' '.join(self.words)))
+                zhuyu = [sbv]
+                weiyu = [hed]
+                # self.words.remove(sbv)
+                hed_index = self.words.index(hed)
+                words_r = self.words[hed_index+1:]
+
+                result[' '.join(zhuyu)] = [' '.join(weiyu), ' '.join(words_r)]
+            return result
 
 # str = "新华社兰州6月3日电（王衡、徐丹）记者从甘肃省交通运输厅获悉，甘肃近日集中开建高速公路、普通国省道、服务区、物流园等涉及12个市州的35个重点交通建设项目，总投资达693.8亿元。\n其中，投资最大的是5条高速和一级公路项目，投资604亿元，包括兰州高速二环公路（清水驿至苦水段、忠和至河口段）、G1816乌海－玛沁高速景泰至中川机场段、G8513平凉－绵阳高速平凉（华亭）至天水段、S216线平凉至华亭一级公路和G341线白银至中川机场段。\n甘肃省交通运输厅介绍，此次集中开建35个重点交通建设项目，在进一步完善路网结构的同时，有助于促进甘肃经济运行趋稳向好、确保完成全年固定资产投资目标任务。（完）"
 # words = jieba.lcut(str)
