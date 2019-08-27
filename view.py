@@ -10,6 +10,7 @@ from flask import request, redirect, jsonify
 from model.models import NewsChinese
 import logging, re
 from train_model import *
+import parse_text
 logger = logging.getLogger()
 
 
@@ -23,21 +24,22 @@ def index():
 def topic():
     news = request.form.get('news')
     if news:
-        parse = ParseDepend()
-        news = parse.deal_sentence(news) # [sent1, sent2, sent3] 处理输入的文本
-        sentence_cos_similar, sentences = compute_sentence_ftidf(news) # [sent1, sent2] 以中文句号分割，计算每两句的相似度。
-        words = []
-        for sentence in sentences:
-            words.extend(sentence.split(' '))
-        parse = ParseDepend(words=sentences)
+        parse = parse_text.ParseDepend()
+        parse.deal_sentence(news)
+        # news = parse.deal_sentence(news) # [sent1, sent2, sent3] 处理输入的文本
+        # sentence_cos_similar, sentences = compute_sentence_ftidf(news) # [sent1, sent2] 以中文句号分割，计算每两句的相似度。
+        # words = []
+        # for sentence in sentences:
+        #     words.extend(sentence.split(' '))
+        # parse = ParseDepend(words=sentences)
         result = parse.get_main() # 句子已存分析
-        zhuyu, weiyu, binyu = result
-        print(zhuyu+weiyu, (''.join(binyu)).replace(' ', ''))
-    return render_template('index.html')
+        result = result
+        print(result)
+    return render_template('index.html', result = result)
 
 
 @app.route('/graph', methods=['GET', 'POST'])
 def graph():
-    draw_graph = DataGraphDisplay()
+    draw_graph = parse_text.DataGraphDisplay()
     draw_graph.word_cloud()
     return render_template('index.html')
