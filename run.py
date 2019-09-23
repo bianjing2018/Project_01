@@ -21,5 +21,5 @@ def config_logger():
 
 if __name__ == "__main__":
     # 设置日志
-    config_logger()
+    # config_logger()
     app.run(port=9999)

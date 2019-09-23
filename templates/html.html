@@ -19,29 +19,29 @@
         }
     </style>
 
-    <script>
-         $(function (){$('#submit_button').on("click", function () {
-                var mychar=document.getElementById("submit_button");
-                // mychar.style.display="none";
-                $.ajax({
-                    url: "/submit/",
-                    type: "POST",
-                    {#data:form,#}
-                    data: new FormData($('#upload_form')[0]),    // 获取json的数据格式
-                    cache: false,
-                    processData:false,
-                    contentType: false,
-                    success: function (arg) {
-                        alert(arg)
-                    }
-                })
-            })});
-    </script>
+<!--    <script>-->
+<!--         $(function (){$('#submit_button').on("click", function () {-->
+<!--                var mychar=document.getElementById("submit_button");-->
+<!--                // mychar.style.display="none";-->
+<!--                $.ajax({-->
+<!--                    url: "/submit/",-->
+<!--                    type: "POST",-->
+<!--                    {#data:form,#}-->
+<!--                    data: new FormData($('#upload_form')[0]),    // 获取json的数据格式-->
+<!--                    cache: false,-->
+<!--                    processData:false,-->
+<!--                    contentType: false,-->
+<!--                    success: function (arg) {-->
+<!--                        alert(result)-->
+<!--                    }-->
+<!--                })-->
+<!--            })});-->
+<!--    </script>-->
 </head>
 <body>
 
 <div class="page-header">
-    <h1>使用MultinomialNB对新闻分类</h1>
+    <h1>对文本内容进行依存分析</h1>
 </div>
 <div>
     <form action="/submit" METHOD="post" id="upload_form">
@@ -49,34 +49,28 @@
             <p>新闻内容：<input class="upfile" type="text" name="news_content" placeholder="新闻内容"></p>
         </div>
         <!--<input class="confirmfile" type="button" id="submit_button" value="确认上传">-->
-        <input class="confirmfile" type="button" id="submit_button" value="确认上传">
+        <input class="confirmfile" type="submit" id="submit_button" value="确认上传">
     </form>
 
-    <form action="/againtrain" METHOD="post">
-        <input class="confirmfile" type="submit" value="重新训练">
-    </form>
 </div>
 
 <hr>
 <div>
-    <!--<caption><h1>状态表</h1></caption>-->
-    <!--<table border="3" width="80%" height="80" id="table_update" bordercolor="cornflowerblue">-->
-
-        <!--<br/>-->
-        <!--<tr align="center">-->
-
-            <!--<td colspan="8">项目</td>-->
-
-        <!--</tr>-->
-
-        <!--<tr align="center" bgcolor="pink">-->
-            <!--<th>中文名</th>-->
-            <!--<th>英文名</th>-->
-            <!--<th>邮箱</th>-->
-            <!--<th>发送状态</th>-->
-        <!--</tr>-->
-
-    <!--</table>-->
+    <caption><h3>返回结果</h3></caption>
+    <table border="1" cellspacing="0">
+        <tr style="color: #2e59d9" align="center">
+            <td>人物</td>
+            <td>动词</td>
+            <td>言论</td>
+        </tr>
+        {%for res in result%}
+          <tr align="center">
+          {%for re in res%}
+            <td>{{ re }}</td>
+          {% endfor %}
+          </tr>
+        {% endfor %}
+    </table>
 
 </div>
 </body>

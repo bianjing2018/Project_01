@@ -15,23 +15,31 @@ import parse_text
 logger = logging.getLogger()
 
 
+@app.route('/html.html/')
+def html():
+    return render_template('html.html')
+
+
+@app.route('/html2.html/')
+def html2():
+    return render_template('html2.html')
+
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    i = 0
-    datas = NewsChinese.query.all()
-    for data in datas:
-        try:
-            content = data.content
-            source = data.source
-
-        except Exception as e:
-            continue
+    # i = 0
+    # datas = NewsChinese.query.all()
+    # for data in datas:
+    #     try:
+    #         content = data.content
+    #         source = data.source
+    #     except Exception as e:
+    #         continue
     return render_template('index.html')
 
 
-@app.route('/topic', methods=['GET', 'POST'])
-def topic():
+@app.route('/submit/', methods=['GET', 'POST'])
+def submit():
     news = request.form.get('news_content')
     if news:
         parse = parse_text.ParseDepend()
@@ -45,7 +53,7 @@ def topic():
         result = parse.get_main() # 句子已存分析
         result = result
         print(result)
-    return render_template('index.html', result = result)
+    return render_template('html.html', result=result)
 
 
 @app.route('/graph', methods=['GET', 'POST'])
