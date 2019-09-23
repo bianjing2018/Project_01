@@ -8,6 +8,7 @@ bootstrap = Bootstrap(app)
 from flask import render_template
 from flask import request, redirect, jsonify
 from model.models import NewsChinese
+import pandas
 import logging, re
 from train_model import *
 import parse_text
@@ -17,12 +18,21 @@ logger = logging.getLogger()
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    i = 0
+    datas = NewsChinese.query.all()
+    for data in datas:
+        try:
+            content = data.content
+            source = data.source
+
+        except Exception as e:
+            continue
     return render_template('index.html')
 
 
 @app.route('/topic', methods=['GET', 'POST'])
 def topic():
-    news = request.form.get('news')
+    news = request.form.get('news_content')
     if news:
         parse = parse_text.ParseDepend()
         parse.deal_sentence(news)

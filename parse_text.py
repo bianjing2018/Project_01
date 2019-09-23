@@ -18,8 +18,6 @@ from matplotlib.pyplot import imread
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-
-
 """python 使用ltp: https://pyltp.readthedocs.io/zh_CN/latest/api.html"""
 CUT_WORD = '../../project_01_data/cut_result' # 所有词的分词结果包含维基百科和新闻数据
 NEWCUTWORD = '../../project_01_data/news_cut_word'  # 新闻分词结果，带标签
