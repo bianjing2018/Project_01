@@ -25,6 +25,10 @@ def html2():
     return render_template('html2.html')
 
 
+@app.route('/', methods=['GET', 'POST'])
+def index_bak():
+    return render_template('index.html')
+
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     # i = 0
@@ -35,6 +39,12 @@ def index():
     #         source = data.source
     #     except Exception as e:
     #         continue
+    # dgd = parse_text.DataGraphDisplay()
+    # solution, seen, quanzhong = dgd.get_say_similar_word()
+    # for key, value in solution.items():
+    #     with open('say_word_similar', 'a') as fw:
+    #         fw.write(value[0] + '\n')
+    # print(solution)
     return render_template('index.html')
 
 

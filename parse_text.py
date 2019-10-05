@@ -197,6 +197,11 @@ class ParseDepend:
                 return sentence[i], i
         return 'nan', 'nan'
 
+    def get_say_similar(self):
+        with open('say_word_similar') as fr:
+            words = fr.readlines()
+        return [word.replace('\n', '') for word in words]
+
     def get_main(self):
         result = []
         for i, sentence in enumerate(self.sentences):
@@ -204,7 +209,7 @@ class ParseDepend:
             self.get_word_depend(sentence)   # 依存分析
             root = self.get_HED(sentence)   # 获取 谓语root
             netags = self.get_ner(sentence)  # 命名实体获取
-            if root:
+            if root and root[2] in self.get_say_similar():
                 hed = root[2]    # 谓语
                 sbv, sbv_i = self.get_word(root[0], 'SBV', sentence)  # 获取主语 root[0] 为谓语动词的索引值
                 zhuyu = [sbv]
@@ -212,5 +217,7 @@ class ParseDepend:
                 hed_index = sentence.index(hed)
                 words_r = sentence[hed_index+1:]
                 result.append([' '.join(zhuyu), ' '.join(weiyu), ' '.join(words_r)])
+        if not result:
+            result = ['不存在"说"相似的谓语动词']
         return result
 
