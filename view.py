@@ -12,17 +12,13 @@ import pandas
 import logging, re
 from train_model import *
 import parse_text
+from views import summarization_simple as ss
 logger = logging.getLogger()
 
 
 @app.route('/html.html/')
 def html():
     return render_template('html.html')
-
-
-@app.route('/html2.html/')
-def html2():
-    return render_template('html2.html')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -71,3 +67,16 @@ def graph():
     draw_graph = parse_text.DataGraphDisplay()
     draw_graph.word_cloud()
     return render_template('index.html')
+
+
+@app.route('/html2.html/')
+def html2():
+    return render_template('html2.html')
+
+
+@app.route('/submit2/', methods=['GET', 'POST'])
+def submit2():
+    news = request.form.get('news_content')
+    if news:
+        result = ss.get_result_simple(news)
+    return render_template('html2.html', result=result)
