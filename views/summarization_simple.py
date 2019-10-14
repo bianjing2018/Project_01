@@ -1,12 +1,15 @@
 import numpy as np
 from collections import Counter
 from gensim.models.word2vec import Word2Vec
+from gensim.models.fasttext import FastText
 import networkx
 from sklearn.decomposition import PCA
 import re
 from embadding.deal_text import cut
+from embadding.base_function import cosine_similar
+from sklearn.metrics.pairwise import cosine_similarity
 """https://www.zhongxiaoping.cn/2019/02/25/SIF%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90/#wu-sif-suan-fa-dai-ma-bu-zou sif算法解析"""
-WORD_VECTOR = '../static/save_file/save_mode2'
+WORD_VECTOR = '../static/save_file/fasttext_size100.model'
 
 
 class TextRankSummarization:
@@ -83,7 +86,7 @@ class TextRankSummarization:
 class SIFSummarization:
 
     def __init__(self, doc_):
-        self.model_word_vector = Word2Vec.load(WORD_VECTOR)
+        self.model_word_vector = FastText.load(WORD_VECTOR)
         self.doc_ = doc_
         self.words = cut(doc_) # 对整篇文章进行分词
         self.counter = Counter(self.words)   # 对分词结果进行Counter，方便计算词频
@@ -98,15 +101,21 @@ class SIFSummarization:
             word_list = cut(sentence)
             sentence_length = len(word_list)
             # 这个就是初步的句子向量的计算方法
-            for word in word_list:
-                if word in self.model_word_vector:
-                    a_value = a / (a + self.get_word_frequency(word))  # smooth inverse frequency, SIF
-                    vs = np.add(vs, np.multiply(a_value, self.model_word_vector[word]))  # vs += sif * word_vector
+            try:
+                if word_list and sentence_length:
+                    for word in word_list:
+                        if word in self.model_word_vector:
+                            a_value = a / (a + self.get_word_frequency(word))  # smooth inverse frequency, SIF
+                            vs = np.add(vs, np.multiply(a_value, self.model_word_vector[word]))  # vs += sif * word_vector
+                        else:
+                            continue
+
+                    vs = np.divide(vs, sentence_length)  # weighted average
+                    sentence_set.append(vs)  # add to our existing re-calculated set of sentences
                 else:
                     continue
-
-            vs = np.divide(vs, sentence_length)  # weighted average
-            sentence_set.append(vs)  # add to our existing re-calculated set of sentences
+            except:
+                continue
         # calculate PCA of this sentence set,计算主成分
         pca = PCA()
         # 使用PCA方法进行训练
@@ -143,43 +152,67 @@ class SIFSummarization:
 
 
 if __name__ == '__main__':
-    text = '受到A股被纳入MSCI指数的利好消息刺激A股市场从周三开始再度上演龙马行情周四上午金融股和白马股表现喜人但是尾盘跳水之后仅金融板块仍维系红盘状态分析人士认为' \
-          '金融股受益于MSCI纳入A股和低估值而重获资金青睐但是存量资金博弈格局下风格交替的震荡格局料延续流动性改善经济悲观预期修正等有助于支撑板块继而大盘指数逐步向好一' \
-          '九再现周四A股市场未能延续周三的上行态势两市成交小幅放量29个中信一级行业中收盘仅银行和非银行金融两个行业指数收红分别上涨180和020从二级行业来看股份制与城商行的涨' \
-          '幅最高达到222国有银行上涨082信托及其他上涨064保险板块上涨034证券板块上涨006银行板块25只成分股中共有21只收红其中招商银行涨幅最大上涨666贵阳银行上涨365上海银行' \
-          '华夏银行浦发银行和兴业银行的涨幅均超过150非银行金融板块44只成分股中共17只个股上涨其中安信信托中国太保涨幅居前两名分别上涨457和304西水股份华安证券中国人寿和新华' \
-          '保险的涨幅也均超过2相对而言券商股多小幅下跌近期对A股市场消息面影响最大的就是MSCI宣布从2018年6月开始将A股纳入MSCI新兴市场指数而其中金融股是占比最大的一个群体国金证券' \
-          '李立峰团队指出最新方案中包含的222只成分股中剔除了中等市值非互联互通可交易的股票以及有停牌限制的标的由于纳入了很多大市值AH股A股在MSCIEM中的权重由05上升到了073其中金融板块' \
-          '占比最高达到4011泛消费次之占比为2426两个板块涵盖了大部分权重股动态来看由于加入了很多是指占比高的金融公司金融板块的权重增加了近一半其他大部分行业权重都受到了稀释尽管A股被纳入M' \
-          'SCI这一利好事件对短期市场情绪有所提振对中长期海外增量资金预期升温但短期内市场量能尚不能有效放大金融股独乐乐情景也就难以持续存量博弈格局下风格交替指数震荡格局难改变光大证券指出利好' \
-          '并未引起市场太大的热情两市指数和成交量均较为平淡但市场风格出现了较大变化白马股金融' \
-          '股上涨的同时成长股题材股全天低迷这表明市场增量资金依然很少存量资金在不同板块之间腾挪这样的跷跷板格局使得指数难有突破市场中期依旧偏空短期依旧可能维持震荡格局'
-    sentence_list = ['受到A股被纳入MSCI指数的利好消息刺激，A股市场从周三开始再度上演龙马行情，周四上午金融股和白马股表现喜人，但是尾盘跳水之后，仅金融板块仍维系红盘状态',
-                     '分析人士认为，金融股受益于MSCI纳入A股和低估值而重获资金青睐，但是存量资金博弈格局下，风格交替的震荡格局料延续',
-                     '流动性改善、经济悲观预期修正等有助于支撑板块继而大盘指数逐步向好',
-                     '29个中信一级行业中，收盘仅银行和非银行金融两个行业指数收红，分别上涨1.80%和0.20%',
-                     '其中，招商银行涨幅最大，上涨6.66%，贵阳银行上涨3.65%，上海银行、华夏银行、浦发银行和兴业银行的涨幅均超过1.50%',
-                     '非银行金融板块44只成分股中，共17只个股上涨',
-                     '其中，安信信托、中国太保涨幅居前两名，分别上涨4.57%和3.04%，西水股份、华安证券、中国人寿和新华保险的涨幅也均超过2%',
-                     '而其中，金融股是占比最大的一个群体',
-                     '国金证券李立峰团队指出，最新方案中包含的222只成分股中，剔除了中等市值、非互联互通可交易的股票以及有停牌限制的标的，由于纳入了很多大市值AH股，A股在MSCI EM中的权重由0.5%上升到了0.73%',
-                     '其中，金融板块占比最高，达到40.11%，泛消费次之，占比为24.26%，两个板块涵盖了大部分权重股',
-                     '动态来看，由于加入了很多是指占比高的金融公司，金融板块的权重增加了近一半，其他大部分行业权重都受到了稀释',
-                     '存量博弈格局下，风格交替、指数震荡格局难改变',
-                     '这表明市场增量资金依然很少，存量资金在不同板块之间腾挪，这样的跷跷板格局使得指数难有突破',
-                     '市场中期依旧偏空，短期依旧可能维持震荡格局']
+    text = "中国首富的位子几乎每年都在变动，这三年来已经换了三位首富。日前，2019年的中国富豪榜正式发布，其中马云又一次成了中国最有钱的。马化腾身价2600亿元排名第二位，许家印以2100亿元的资产，" \
+           "排名第三位。作为“新科”首富，马云不仅让自己成为千亿级别的富豪，更是让12位下属员工也都成了身价亿万的富豪。马云以2750亿元的财富再次登顶富豪榜榜首，成为中国新首富。与之前的榜单相比，" \
+           "马云家族的财富仅仅增加了50亿元。虽然财富增幅不大，但是这在很大程度上意味着马云所建立的阿里巴巴帝国在市场中的地位日渐稳固。电商等核心业务的稳健发展与市场扩张，是阿里巴巴保持较高市" \
+           "值的关键，也是马云家族财富稳固的重要保障。除了个人身价增长外，阿里系的12名员工也都登上了富豪榜，这些人都是马云的下属，手中也都握有阿里的股票。可以预见的是，虽然创始人已经正式退休，" \
+           "但是阿里的未来的发展方向不会变，甚至可能会比马云主政时期发展的更为迅猛。现在的阿里可以说是人才济济，良将如云，根本不用为人才断层所发愁。近日流传，马云将收购刷爆朋友圈的安贸通APP，" \
+           "一双双上千元的耐克阿迪运动鞋，上万元Lv香奈儿等奢侈品，在安贸通APP上不到100元，质量却堪比正品？而微信一对一交流女大学生店主，或是马云又开始尝试社交电商了吗？中国首富的位置其实说是财富，" \
+           "在一定的程度上面也影响了很多人，马云的口碑是十分不错的，不仅在向全世界宣传中国，时时刻刻不忘了造福百姓，宣传国家的形象，影响改变着我们的生活，让我们的生活走向更为发展的路程，" \
+           "马云成为中古首富想必也是大家希望的。"
+    sentence_list = text.split('。')
+    title_ = '中国新首富诞生：身家2750亿力压马化腾，许家印排名仅第3'
     sentence_list.append(text)
+    sentence_list.append(title_)
     ss = SIFSummarization(text)
     sentence_vector_list = ss.sentence_to_vec(sentence_list)
-    similar = ss.compute_similar_by_cosine(sentence_vector_list)
-    print(similar)
+    titleVector = sentence_vector_list.pop(-1)
+    docVector = sentence_vector_list.pop(-1)
+
+    # 利用sif
+    similar = []
+    for vector in sentence_vector_list:
+        similar.append(cosine_similar(vector, docVector))
+    similar = {i: v for i, v in enumerate(similar)}
+    # similar = ss.compute_similar_by_cosine(sentence_vector_list)
+    # print(similar)
     sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
-    sss = sorted(sss[: 3], key=lambda x: x[1], reverse=True)
+    sss = sorted(sss, key=lambda x: x[1], reverse=True)
+    print(sss)
     summ = ''
     for i, v in sss:
         summ += sentence_list[i]
         summ += ' '
-
-
+        if len(summ) >= 100:
+            break
     print(summ)
+
+
+    # 利用 标题
+    similar = []
+    for vector in sentence_vector_list:
+        similar.append(cosine_similar(vector, titleVector))
+    similar = {i: v for i, v in enumerate(similar)}
+    # similar = ss.compute_similar_by_cosine(sentence_vector_list)
+    # print(similar)
+    sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
+    sss = sorted(sss, key=lambda x: x[1], reverse=True)
+    print(sss)
+    summ = ''
+    for i, v in sss:
+        summ += sentence_list[i]
+        summ += ' '
+        if len(summ) >= 100:
+            break
+    print(summ)
+
+    # 利用textrank
+    trs = TextRankSummarization()
+    result = trs.get_result_simple(text)
+    print(result)
+
+
+
+
+
 

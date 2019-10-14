@@ -28,7 +28,15 @@
 <div>
     <form action="/submit2" METHOD="post" id="upload_form">
         <div>
-            <p>新闻内容：<input class="upfile" type="text" name="news_content" placeholder="新闻内容"></p>
+            <div>
+                <p>新闻标题：<input class="upfile" type="text" name="news_title" placeholder="新闻标题"></p>
+                <input type="text" name="news_content" placeholder="新闻内容">
+            </div>
+            <div>
+                <h5>返回结果</h5>
+                {{ result }}
+            </div>
+            
         </div>
         <input class="confirmfile" type="submit" id="submit_button" value="确认上传">
     </form>
@@ -38,7 +46,7 @@
 <hr>
 <div>
     <caption><h3>返回结果</h3></caption>
-          {{ result }}
+
     </table>
 
 </div>
