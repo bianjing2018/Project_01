@@ -78,5 +78,5 @@ def html2():
 def submit2():
     news = request.form.get('news_content')
     if news:
-        result = ss.get_result_simple(news)
+        result = ss.TextRankSummarization().get_result_simple(news)
     return render_template('html2.html', result=result)
