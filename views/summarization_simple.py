@@ -9,7 +9,8 @@ from embadding.deal_text import cut
 from embadding.base_function import cosine_similar
 from sklearn.metrics.pairwise import cosine_similarity
 """https://www.zhongxiaoping.cn/2019/02/25/SIF%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90/#wu-sif-suan-fa-dai-ma-bu-zou sif算法解析"""
-WORD_VECTOR = '../static/save_file/fasttext_size100.model'
+
+WORD_VECTOR = '/Users/bj/Desktop/Documents/Project_01/static/save_file/save_mode2'
 
 
 class TextRankSummarization:
@@ -85,9 +86,10 @@ class TextRankSummarization:
 
 class SIFSummarization:
 
-    def __init__(self, doc_):
-        self.model_word_vector = FastText.load(WORD_VECTOR)
+    def __init__(self, doc_, title_):
+        self.model_word_vector = Word2Vec.load(WORD_VECTOR)
         self.doc_ = doc_
+        self.title_ = title_
         self.words = cut(doc_) # 对整篇文章进行分词
         self.counter = Counter(self.words)   # 对分词结果进行Counter，方便计算词频
 
@@ -150,6 +152,36 @@ class SIFSummarization:
         similar_ = {i: v for i, v in enumerate(similar)}
         return similar_
 
+    def main(self):
+        text = self.doc_
+        title_ = self.title_
+        sentence_list = text.split('。')
+        sentence_list.append(text)
+        sentence_list.append(title_)
+        sentence_vector_list = self.sentence_to_vec(sentence_list)
+        titleVector = sentence_vector_list.pop(-1)
+        similar = []
+        for vector in sentence_vector_list:
+            similar.append(cosine_similar(vector, titleVector))
+        similar = {i: v for i, v in enumerate(similar)}
+        sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
+        sss = sorted(sss, key=lambda x: x[1], reverse=True)
+        print(sss)
+        summ = ''
+        sorted_score = []
+        for i, v in sss:
+            summ += sentence_list[i]
+            summ += ' '
+            if len(summ) >= 100:
+                break
+            sorted_score.append(i)
+        summ = ''
+        sorted_score.sort()
+        for i in sorted_score:
+            summ += sentence_list[i]
+            summ += '。'
+        return summ
+
 
 if __name__ == '__main__':
     text = "中国首富的位子几乎每年都在变动，这三年来已经换了三位首富。日前，2019年的中国富豪榜正式发布，其中马云又一次成了中国最有钱的。马化腾身价2600亿元排名第二位，许家印以2100亿元的资产，" \
@@ -169,24 +201,23 @@ if __name__ == '__main__':
     titleVector = sentence_vector_list.pop(-1)
     docVector = sentence_vector_list.pop(-1)
 
-    # 利用sif
-    similar = []
-    for vector in sentence_vector_list:
-        similar.append(cosine_similar(vector, docVector))
-    similar = {i: v for i, v in enumerate(similar)}
-    # similar = ss.compute_similar_by_cosine(sentence_vector_list)
-    # print(similar)
-    sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
-    sss = sorted(sss, key=lambda x: x[1], reverse=True)
-    print(sss)
-    summ = ''
-    for i, v in sss:
-        summ += sentence_list[i]
-        summ += ' '
-        if len(summ) >= 100:
-            break
-    print(summ)
-
+    # # 利用sif
+    # similar = []
+    # for vector in sentence_vector_list:
+    #     similar.append(cosine_similar(vector, docVector))
+    # similar = {i: v for i, v in enumerate(similar)}
+    # # similar = ss.compute_similar_by_cosine(sentence_vector_list)
+    # # print(similar)
+    # sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
+    # sss = sorted(sss, key=lambda x: x[1], reverse=True)
+    # print(sss)
+    # summ = ''
+    # for i, v in sss:
+    #     summ += sentence_list[i]
+    #     summ += ' '
+    #     if len(summ) >= 100:
+    #         break
+    # print(summ)
 
     # 利用 标题
     similar = []

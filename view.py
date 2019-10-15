@@ -77,6 +77,14 @@ def html2():
 @app.route('/submit2/', methods=['GET', 'POST'])
 def submit2():
     news = request.form.get('news_content')
+    news_title = request.form.get('news_title')
+    res = ''
     if news:
-        result = ss.TextRankSummarization().get_result_simple(news)
-    return render_template('html2.html', result=result)
+        res = ss.TextRankSummarization().get_result_simple(news)
+        print(res)
+    if news_title:
+        sif = ss.SIFSummarization(news, news_title)
+        title_result = sif.main()
+        res = title_result
+        print(res)
+    return render_template('html2.html', result=res)

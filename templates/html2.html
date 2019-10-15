@@ -17,6 +17,12 @@
         #submit_button {
             border-left: 200px;
         }
+        .div-a{ float:left;width:49%;height: 300px;border:1px solid #ffffff}
+        .div-b{ float:left;width:49%;height: 300px;border:1px solid #ffffff}
+        .textarea-a{width: 100%;}
+        .textarea-b{margin: 35px; width: 90%}
+        .div-a-01{float:left;width:70%;}
+        .div-a-02{float:left;width:10%;}
     </style>
 
 </head>
@@ -27,28 +33,25 @@
 </div>
 <div>
     <form action="/submit2" METHOD="post" id="upload_form">
-        <div>
-            <div>
-                <p>新闻标题：<input class="upfile" type="text" name="news_title" placeholder="新闻标题"></p>
-                <input type="text" name="news_content" placeholder="新闻内容">
+        <div class="div-a">
+            <div class="div-a-01">
+                <input class="upfile" type="text" name="news_title" placeholder="新闻标题">
             </div>
-            <div>
-                <h5>返回结果</h5>
-                {{ result }}
+            <div class="div-a-02">
+                <input class="confirmfile" type="submit" id="submit_button" value="确认上传">
             </div>
-            
+            <textarea name="news_content" class="textarea-a" cols="30" rows="10" placeholder="新闻内容"></textarea>
         </div>
-        <input class="confirmfile" type="submit" id="submit_button" value="确认上传">
+        <div class="div-b">
+            <textarea class="textarea-b" cols="30" rows="10">
+                {{ result }}
+            </textarea>
+        </div>
+
     </form>
 
 </div>
 
 <hr>
-<div>
-    <caption><h3>返回结果</h3></caption>
-
-    </table>
-
-</div>
 </body>
 </html>
