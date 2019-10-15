@@ -5,12 +5,13 @@ from gensim.models.fasttext import FastText
 import networkx
 from sklearn.decomposition import PCA
 import re
+import gensim
 from embadding.deal_text import cut
 from embadding.base_function import cosine_similar
 from sklearn.metrics.pairwise import cosine_similarity
 """https://www.zhongxiaoping.cn/2019/02/25/SIF%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90/#wu-sif-suan-fa-dai-ma-bu-zou sif算法解析"""
 
-WORD_VECTOR = '/Users/bj/Desktop/Documents/Project_01/static/save_file/save_mode2'
+WORD_VECTOR = '/Users/haha/Desktop/Project_01/static/save_file/save_mode2'
 
 
 class TextRankSummarization:
@@ -78,7 +79,7 @@ class TextRankSummarization:
         return result
 
     def get_result_simple(self, text):
-        summarization = self.get_summarization_simple_with_text_rank(text)
+        summarization = self.get_summarization_simple_with_text_rank(text, constrain=len(text) // 2)
         result = self.punctuation_to_sentence(summarization, text)
         result = (''.join(result)).split('。')
         return '。'.join(result[: -1]) + '。'
@@ -86,8 +87,8 @@ class TextRankSummarization:
 
 class SIFSummarization:
 
-    def __init__(self, doc_, title_):
-        self.model_word_vector = Word2Vec.load(WORD_VECTOR)
+    def __init__(self, doc_, title_=None):
+        self.model_word_vector = gensim.models.Word2Vec.load(WORD_VECTOR)
         self.doc_ = doc_
         self.title_ = title_
         self.words = cut(doc_) # 对整篇文章进行分词
@@ -152,95 +153,77 @@ class SIFSummarization:
         similar_ = {i: v for i, v in enumerate(similar)}
         return similar_
 
-    def main(self):
-        text = self.doc_
-        title_ = self.title_
-        sentence_list = text.split('。')
-        sentence_list.append(text)
-        sentence_list.append(title_)
-        sentence_vector_list = self.sentence_to_vec(sentence_list)
-        titleVector = sentence_vector_list.pop(-1)
-        similar = []
+    def main(self, flags=1):
+        """
+
+        :param flags: 1 使用标题匹配文本相似度；其他值使用sif，每个句子和长文本进行相似度计算
+        :return:
+        """
+        sentence_list = self.doc_.split('。')
+
+        if flags == 1:
+            sentence_list.append(self.title_) # 长文本按句号切分句子
+
+        else:
+            sentence_list.append(self.doc_) # 将长文本作为句子
+        sentence_vector_list = self.sentence_to_vec(sentence_list, embedding_size=100)  # 获得每个句子的句子向量
+        special_vector = sentence_vector_list.pop(-1)  # 取出最后一个(标题或长文本)句子向量
+
+        similar_ = []
         for vector in sentence_vector_list:
-            similar.append(cosine_similar(vector, titleVector))
-        similar = {i: v for i, v in enumerate(similar)}
-        sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
-        sss = sorted(sss, key=lambda x: x[1], reverse=True)
-        print(sss)
-        summ = ''
-        sorted_score = []
-        for i, v in sss:
-            summ += sentence_list[i]
-            summ += ' '
-            if len(summ) >= 100:
-                break
-            sorted_score.append(i)
-        summ = ''
+            similar_.append(cosine_similar(vector, special_vector))
+
+        similar_ = {i: v for i, v in enumerate(similar_)} # 对应cosine value 和 index
+        similar_ = sorted(similar_.items(), key=lambda x: x[1], reverse=True)  # 根据cosine value排序
+        similar_ = sorted(similar_, key=lambda x: x[1], reverse=True) # 根据
+
+        sorted_score = [i for i, v in similar_[: 3]]  # 取出前3个cosine value 最大的索引
+
+        result = ''
         sorted_score.sort()
         for i in sorted_score:
-            summ += sentence_list[i]
-            summ += '。'
-        return summ
+            result += sentence_list[i]
+            result += '。'
+        return result, sorted_score, sentence_list
 
 
 if __name__ == '__main__':
-    text = "中国首富的位子几乎每年都在变动，这三年来已经换了三位首富。日前，2019年的中国富豪榜正式发布，其中马云又一次成了中国最有钱的。马化腾身价2600亿元排名第二位，许家印以2100亿元的资产，" \
-           "排名第三位。作为“新科”首富，马云不仅让自己成为千亿级别的富豪，更是让12位下属员工也都成了身价亿万的富豪。马云以2750亿元的财富再次登顶富豪榜榜首，成为中国新首富。与之前的榜单相比，" \
-           "马云家族的财富仅仅增加了50亿元。虽然财富增幅不大，但是这在很大程度上意味着马云所建立的阿里巴巴帝国在市场中的地位日渐稳固。电商等核心业务的稳健发展与市场扩张，是阿里巴巴保持较高市" \
-           "值的关键，也是马云家族财富稳固的重要保障。除了个人身价增长外，阿里系的12名员工也都登上了富豪榜，这些人都是马云的下属，手中也都握有阿里的股票。可以预见的是，虽然创始人已经正式退休，" \
-           "但是阿里的未来的发展方向不会变，甚至可能会比马云主政时期发展的更为迅猛。现在的阿里可以说是人才济济，良将如云，根本不用为人才断层所发愁。近日流传，马云将收购刷爆朋友圈的安贸通APP，" \
-           "一双双上千元的耐克阿迪运动鞋，上万元Lv香奈儿等奢侈品，在安贸通APP上不到100元，质量却堪比正品？而微信一对一交流女大学生店主，或是马云又开始尝试社交电商了吗？中国首富的位置其实说是财富，" \
-           "在一定的程度上面也影响了很多人，马云的口碑是十分不错的，不仅在向全世界宣传中国，时时刻刻不忘了造福百姓，宣传国家的形象，影响改变着我们的生活，让我们的生活走向更为发展的路程，" \
-           "马云成为中古首富想必也是大家希望的。"
-    sentence_list = text.split('。')
-    title_ = '中国新首富诞生：身家2750亿力压马化腾，许家印排名仅第3'
-    sentence_list.append(text)
-    sentence_list.append(title_)
-    ss = SIFSummarization(text)
-    sentence_vector_list = ss.sentence_to_vec(sentence_list)
-    titleVector = sentence_vector_list.pop(-1)
-    docVector = sentence_vector_list.pop(-1)
+    text = """
+    土耳其大军挺进叙利亚之后，中东局势瞬间就乱成了一锅粥。
+就目前来看，库尔德已经主动倒戈叙利亚政府，双方正准备联手对土耳其发动反攻；担忧难民危机卷土重来的英法德，也多次对安卡拉发出危险信号；一心想要复苏俄罗斯经济的普京，则不声不响间和沙特达成了新的军事合作协议；坐山观虎斗的白宫，心心念念的都是怎样用挑起冲突的方式，去让各大势力为美国利益买单。
+对土耳其而言，现在已经陷入进退两难的局面：向前一步是荆棘，面对叙利亚政府军、库尔德武装和随时都可能出手的俄军、伊朗士兵，土耳其实在是心有余而力不足；向后一步是深渊——箭在弦上不得不发。土耳其现在的经济状况不容乐观，如果安卡拉就此向美英法德妥协，那么土耳其民众必然不会轻易作罢，库尔德这个"眼中钉"也会继续威胁到土耳其的稳定。
+怎么办？这是埃尔多安不得不直面的难题。
 
-    # # 利用sif
-    # similar = []
-    # for vector in sentence_vector_list:
-    #     similar.append(cosine_similar(vector, docVector))
-    # similar = {i: v for i, v in enumerate(similar)}
-    # # similar = ss.compute_similar_by_cosine(sentence_vector_list)
-    # # print(similar)
-    # sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
-    # sss = sorted(sss, key=lambda x: x[1], reverse=True)
-    # print(sss)
-    # summ = ''
-    # for i, v in sss:
-    #     summ += sentence_list[i]
-    #     summ += ' '
-    #     if len(summ) >= 100:
-    #         break
-    # print(summ)
+10月13日，默克尔、马克龙、约翰逊分别给埃尔多安打了电话。英法德强调，土耳其应立即停止在叙利亚内的军事行动（请注意是立即，言下之意就是没有讨价还价的余地），否则欧洲多国将中止对土耳其的武器出口和经济帮助。英法德认为，安卡拉突然发动的战争，将导致数十万叙利亚民众流离失所，IS必然也会借机趁火打劫，对欧洲和中东各国而言，这将是难以承受之重。
+几乎同时，白宫也对土耳其发出了威胁。美国表示，若安卡拉继续铤而走险，那么美国将让土耳其经济彻底陷入瘫痪，等待土耳其的，只能是吃不了兜着走。
+然而，已经打红了眼的土耳其却根本不愿认怂。土耳其在日前表示，试图通过经济制裁、取消武器出口等方式来施压安卡拉的国家，终究只能竹篮打水一场空，土耳其不会接受任何国家的斡旋和调停，安卡拉拒绝与库尔德进行谈判。安卡拉强调，土军将继续在叙利亚内作战，直至将恐怖分子（库尔德武装）彻底清除。
 
-    # 利用 标题
-    similar = []
-    for vector in sentence_vector_list:
-        similar.append(cosine_similar(vector, titleVector))
-    similar = {i: v for i, v in enumerate(similar)}
-    # similar = ss.compute_similar_by_cosine(sentence_vector_list)
-    # print(similar)
-    sss = sorted(similar.items(), key=lambda x: x[1], reverse=True)
-    sss = sorted(sss, key=lambda x: x[1], reverse=True)
-    print(sss)
-    summ = ''
-    for i, v in sss:
-        summ += sentence_list[i]
-        summ += ' '
-        if len(summ) >= 100:
-            break
-    print(summ)
+
+值得一提的是，土耳其还特意对美国放了狠话。10月12日，土耳其外长公然喊话白宫："若安卡拉畏惧被制裁，那么我们就不会打响这场战争。"安卡拉强调，没有谁能摧毁土耳其经济，如果美国真要对土耳其下狠手，那么安卡拉必定以牙还牙。
+安卡拉是这么说的，土耳其军队也是这么干的。
+据俄新社报道，在土耳其军队的穷追猛打下，库尔德武装可说是损失重大，占据的城镇被接连攻克且不说，伤亡数量也一直在不断增加。此外，土耳其雇佣兵还在12日打死了库尔德赫赫有名的女性领导人哈拉夫，这件事让美法等国感到非常震撼。
+报道称，哈拉夫的外交才能非常卓越，曾多次参加包括美法等国代表在内的会议，美国前总统特使麦古尔克表示，土耳其对哈拉夫的"处决"是不可接受的，这已经构成了战争罪。但在土耳其看来，这却是非常成功的军事行动。
+
+
+无视美英法德威胁、接连向叙利亚政府和库尔德武装放狠话后，已经成为众矢之的的土耳其，居然还在关键时刻干了一件大事，这确实让白宫感到始料未及。但可以肯定的是，按照美国从不甘心哑巴亏的性格，在被土耳其"咣咣咣"的打脸后，白宫一定会做出与之对应的报复举动。
+    """
+    title_ = '以牙还牙？面对美英法德施压，土耳其终于表态了！态度非常强硬'
 
     # 利用textrank
     trs = TextRankSummarization()
-    result = trs.get_result_simple(text)
-    print(result)
+    txk_result = trs.get_result_simple(text)
+    print(txk_result)
+
+    sif = SIFSummarization(text)
+
+    sif_result_, sorted_score_, sentence_list_ = sif.main(flags=0)
+    print(sif_result_, end='\n')
+
+    sif = SIFSummarization(text, title_)
+    sif_result, sorted_score, sentence_list = sif.main(flags=1)
+    print(sif_result, sorted_score, sep='\n')
+
+
 
 
 
