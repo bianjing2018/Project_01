@@ -33,7 +33,7 @@ class TextRankSummarization:
     def split_sentence(self, sentence):
         """split"""
         sentence = ''.join(re.findall(r'[^\s]', sentence))
-        pattern = re.compile('[。，,.]')
+        pattern = re.compile('[。，]')
         split = pattern.sub(' ', sentence).split()
         return split
 
@@ -79,7 +79,7 @@ class TextRankSummarization:
         return result
 
     def get_result_simple(self, text):
-        summarization = self.get_summarization_simple_with_text_rank(text, constrain=len(text) // 5)
+        summarization = self.get_summarization_simple_with_text_rank(text, constrain=len(text) // 10)
         result = self.punctuation_to_sentence(summarization, text)
         result = (''.join(result)).split('。')
         return '。'.join(result[: -1]) + '。'
@@ -155,7 +155,6 @@ class SIFSummarization:
 
     def main(self, flags=1):
         """
-
         :param flags: 1 使用标题匹配文本相似度；其他值使用sif，每个句子和长文本进行相似度计算
         :return:
         """

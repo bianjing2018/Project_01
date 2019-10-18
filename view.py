@@ -81,6 +81,9 @@ def submit2():
     res = ''
     if news:
         res = ss.TextRankSummarization().get_result_simple(news)
+        # sif = ss.SIFSummarization(news)
+        # sif_result, sorted_score, sentence_list = sif.main(flags=0)
+        # res = sif_result
         # print(res)
     if news_title:
         sif = ss.SIFSummarization(news, news_title)
