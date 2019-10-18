@@ -6,12 +6,13 @@ import networkx
 from sklearn.decomposition import PCA
 import re
 import gensim
+from views.textrank_word2vec import summarize
 from embadding.deal_text import cut
 from embadding.base_function import cosine_similar
 from sklearn.metrics.pairwise import cosine_similarity
 """https://www.zhongxiaoping.cn/2019/02/25/SIF%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90/#wu-sif-suan-fa-dai-ma-bu-zou sif算法解析"""
 
-WORD_VECTOR = '/Users/bj/Desktop/Documents/Project_01/static/save_file/save_mode2'
+WORD_VECTOR = '/Users/haha/Desktop/Project_01/static/save_file/save_mode2'
 
 
 class TextRankSummarization:
@@ -33,7 +34,7 @@ class TextRankSummarization:
     def split_sentence(self, sentence):
         """split"""
         sentence = ''.join(re.findall(r'[^\s]', sentence))
-        pattern = re.compile('[。，]')
+        pattern = re.compile('[。？?!！.]')
         split = pattern.sub(' ', sentence).split()
         return split
 
@@ -187,37 +188,24 @@ class SIFSummarization:
 
 
 if __name__ == '__main__':
-    text = """
-    土耳其大军挺进叙利亚之后，中东局势瞬间就乱成了一锅粥。
-就目前来看，库尔德已经主动倒戈叙利亚政府，双方正准备联手对土耳其发动反攻；担忧难民危机卷土重来的英法德，也多次对安卡拉发出危险信号；一心想要复苏俄罗斯经济的普京，则不声不响间和沙特达成了新的军事合作协议；坐山观虎斗的白宫，心心念念的都是怎样用挑起冲突的方式，去让各大势力为美国利益买单。
-对土耳其而言，现在已经陷入进退两难的局面：向前一步是荆棘，面对叙利亚政府军、库尔德武装和随时都可能出手的俄军、伊朗士兵，土耳其实在是心有余而力不足；向后一步是深渊——箭在弦上不得不发。土耳其现在的经济状况不容乐观，如果安卡拉就此向美英法德妥协，那么土耳其民众必然不会轻易作罢，库尔德这个"眼中钉"也会继续威胁到土耳其的稳定。
-怎么办？这是埃尔多安不得不直面的难题。
-
-10月13日，默克尔、马克龙、约翰逊分别给埃尔多安打了电话。英法德强调，土耳其应立即停止在叙利亚内的军事行动（请注意是立即，言下之意就是没有讨价还价的余地），否则欧洲多国将中止对土耳其的武器出口和经济帮助。英法德认为，安卡拉突然发动的战争，将导致数十万叙利亚民众流离失所，IS必然也会借机趁火打劫，对欧洲和中东各国而言，这将是难以承受之重。
-几乎同时，白宫也对土耳其发出了威胁。美国表示，若安卡拉继续铤而走险，那么美国将让土耳其经济彻底陷入瘫痪，等待土耳其的，只能是吃不了兜着走。
-然而，已经打红了眼的土耳其却根本不愿认怂。土耳其在日前表示，试图通过经济制裁、取消武器出口等方式来施压安卡拉的国家，终究只能竹篮打水一场空，土耳其不会接受任何国家的斡旋和调停，安卡拉拒绝与库尔德进行谈判。安卡拉强调，土军将继续在叙利亚内作战，直至将恐怖分子（库尔德武装）彻底清除。
-
-
-值得一提的是，土耳其还特意对美国放了狠话。10月12日，土耳其外长公然喊话白宫："若安卡拉畏惧被制裁，那么我们就不会打响这场战争。"安卡拉强调，没有谁能摧毁土耳其经济，如果美国真要对土耳其下狠手，那么安卡拉必定以牙还牙。
-安卡拉是这么说的，土耳其军队也是这么干的。
-据俄新社报道，在土耳其军队的穷追猛打下，库尔德武装可说是损失重大，占据的城镇被接连攻克且不说，伤亡数量也一直在不断增加。此外，土耳其雇佣兵还在12日打死了库尔德赫赫有名的女性领导人哈拉夫，这件事让美法等国感到非常震撼。
-报道称，哈拉夫的外交才能非常卓越，曾多次参加包括美法等国代表在内的会议，美国前总统特使麦古尔克表示，土耳其对哈拉夫的"处决"是不可接受的，这已经构成了战争罪。但在土耳其看来，这却是非常成功的军事行动。
-
-
-无视美英法德威胁、接连向叙利亚政府和库尔德武装放狠话后，已经成为众矢之的的土耳其，居然还在关键时刻干了一件大事，这确实让白宫感到始料未及。但可以肯定的是，按照美国从不甘心哑巴亏的性格，在被土耳其"咣咣咣"的打脸后，白宫一定会做出与之对应的报复举动。
-    """
-    title_ = '以牙还牙？面对美英法德施压，土耳其终于表态了！态度非常强硬'
+    with open("../static/news.txt", "r", encoding='utf-8') as myfile:
+        text = myfile.read().replace('\n', '')
+    title_ = '中华人民共和国成立70周年庆祝活动总结会议在京举行 习近平亲切会见庆祝活动筹办工作有关方面代表'
 
     # 利用textrank
     trs = TextRankSummarization()
     txk_result = trs.get_result_simple(text)
     print(txk_result)
 
+
+    print('*' * 100)
+    print(summarize(text, 2))
+
     sif = SIFSummarization(text)
-
     sif_result_, sorted_score_, sentence_list_ = sif.main(flags=0)
+    print('*' * 100)
     print(sif_result_, end='\n')
-
+    #
     sif = SIFSummarization(text, title_)
     sif_result, sorted_score, sentence_list = sif.main(flags=1)
     print(sif_result, sorted_score, sep='\n')
