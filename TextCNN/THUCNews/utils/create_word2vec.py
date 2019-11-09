@@ -11,7 +11,7 @@ import random
 import numpy as np
 import os
 import math
-from utils import files_processing,segment
+from . import files_processing,segment
 
 
 def info_npy(file_list):

@@ -13,7 +13,7 @@ import os
 import io
 import math
 import re
-from utils import files_processing
+from . import files_processing
 
 '''
 read() 每次读取整个文件，它通常将读取到底文件内容放到一个字符串变量中，也就是说 .read() 生成文件内容是一个字符串类型。

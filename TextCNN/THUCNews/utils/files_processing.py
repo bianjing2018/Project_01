@@ -15,7 +15,7 @@ import re
 import os
 import math
 from sklearn import preprocessing
-from utils import segment
+from . import segment
 import pickle
 import glob
 

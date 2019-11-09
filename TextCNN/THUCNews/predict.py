@@ -4,8 +4,8 @@
 import tensorflow as tf
 import numpy as np
 import os
-from text_cnn import TextCNN
-from utils import create_batch_data, create_word2vec, files_processing
+from .text_cnn import TextCNN
+from .utils import create_batch_data, create_word2vec, files_processing
 import math
 
 

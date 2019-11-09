@@ -4,8 +4,8 @@
 import tensorflow as tf
 import numpy as np
 import os
-from text_cnn import TextCNN
-from utils import create_batch_data, create_word2vec, files_processing
+from .text_cnn import TextCNN
+from .utils import create_batch_data, create_word2vec, files_processing
 
 def train(train_dir,val_dir,labels_file,word2vec_path,batch_size,max_steps,log_step,val_step,snapshot,out_dir):
     '''

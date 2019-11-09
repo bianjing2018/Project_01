@@ -12,7 +12,7 @@ import os
 import glob
 import numpy as np
 from sklearn import preprocessing
-from utils import create_word2vec, files_processing
+from . import create_word2vec, files_processing
 
 
 def get_data_batch(file_list,labels_nums,batch_size=None, shuffle=False,one_hot=False):
