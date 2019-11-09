@@ -1,6 +1,12 @@
 import jieba
 import re
+import os
 
+
+if os.path.exists('/root/flag_server'):
+    path = '/root/project/Project_01//static/stopwords'
+else:
+    path = '../static/stopwords'
 
 def cut(sentence):
     pattern = re.compile('[\w+]')
@@ -10,7 +16,7 @@ def cut(sentence):
 
 
 def stop_word(words):
-    with open('/root/project/Project_01//static/stopwords', 'r') as fr:
+    with open(path, 'r') as fr:
         stopwords = fr.readlines()
 
     stopwords = [word.replace('\n', '') for word in stopwords ]

@@ -12,8 +12,11 @@ import pandas
 import logging, re
 from train_model import *
 import parse_text
+import os
 from views import summarization_simple as ss
+from TextCNN.THUCNews import predict
 logger = logging.getLogger()
+
 
 
 @app.route('/html.html/')
@@ -91,3 +94,20 @@ def submit2():
         res = sif_result
         # print(res)
     return render_template('html2.html', result=res)
+
+
+@app.route('/html3.html/')
+def html3():
+    return render_template('html3.html')
+
+
+@app.route('/submit3/', methods=['GET', 'POST'])
+def submit3():
+    user_info = request.values.to_dict()
+    news = request.form.get('news_content')
+    if os.path.exists('./TextCNN/THUCNews/data/my_test/test.txt'):
+        os.remove('./TextCNN/THUCNews/data/my_test/test.txt')
+    with open('./TextCNN/THUCNews/data/my_test/test.txt', 'w') as f:
+        f.write(news)
+    res = predict.main()
+    return render_template('html3.html', result=[res])

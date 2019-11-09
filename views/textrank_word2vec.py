@@ -5,8 +5,14 @@ from heapq import nlargest
 from itertools import product, count
 from gensim.models import word2vec
 import numpy as np
+import os
 
-model = word2vec.Word2Vec.load("/root/project/Project_01/static/save_file/save_mode2")
+
+if os.path.exists('/root/flag_server'):
+    WORD_VECTOR = '/root/project/Project_01/static/save_file/save_mode2'
+else:
+    WORD_VECTOR = '/Users/haha/Desktop/Project_01/static/save_file/save_mode2'
+model = word2vec.Word2Vec.load(WORD_VECTOR)
 np.seterr(all='warn')
 
 
