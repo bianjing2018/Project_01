@@ -6,7 +6,10 @@ import os
 if os.path.exists('/root/flag_server'):
     path = '/root/project/Project_01//static/stopwords'
 else:
-    path = '../static/stopwords'
+    if os.path.exists('/Users/bj'):
+        path = '/Users/bj/Desktop/Documents/Project_01/static/stopwords'
+    elif os.path.exists('/Users/haha'):
+        path = '/Users/haha/Desktop//Project_01/static/stopwords'
 
 def cut(sentence):
     pattern = re.compile('[\w+]')

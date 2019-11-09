@@ -16,8 +16,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 if os.path.exists('/root/flag_server'):
     WORD_VECTOR = '/root/project/Project_01/static/save_file/save_mode2'
-else:
+elif os.path.exists('/Users/haha'):
     WORD_VECTOR = '/Users/haha/Desktop/Project_01/static/save_file/save_mode2'
+elif os.path.exists('/Users/bj') :
+    WORD_VECTOR = '/Users/bj/Desktop/Documents/Project_01/static/save_file/save_mode2'
 
 
 class TextRankSummarization:

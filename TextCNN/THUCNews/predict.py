@@ -172,10 +172,16 @@ def main():
         test_path = '/root/project/Project_01/TextCNN/THUCNews/data/my_test/'
         models_path = '/root/project/Project_01/TextCNN/THUCNews/models/checkpoints/model-30000'
     else:
-        labels_file = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/data/THUCNews_labels.txt'
-        word2vec_path = "/Volumes/Samsung_T5/AI/TextCNNClassfication_SinaNewsData/THUCNews_word2Vec/THUCNews_word2Vec_128.model"
-        test_path = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/data/my_test/'
-        models_path = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/models/checkpoints/model-30000'
+        if os.path.exists('/Users/haha'):
+            labels_file = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/data/THUCNews_labels.txt'
+            word2vec_path = "/Volumes/Samsung_T5/AI/TextCNNClassfication_SinaNewsData/THUCNews_word2Vec/THUCNews_word2Vec_128.model"
+            test_path = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/data/my_test/'
+            models_path = '/Users/haha/Desktop/Project_01/TextCNN/THUCNews/models/checkpoints/model-30000'
+        else:
+            labels_file = '/Users/bj/Desktop/Documents/Project_01/TextCNN/THUCNews/data/THUCNews_labels.txt'
+            word2vec_path = "/Volumes/Samsung_T5/AI/TextCNNClassfication_SinaNewsData/THUCNews_word2Vec/THUCNews_word2Vec_128.model"
+            test_path = '/Users/bj/Desktop/Documents/Project_01/TextCNN/THUCNews/data/my_test/'
+            models_path = '/Users/bj/Desktop/Documents/Project_01/TextCNN/THUCNews/models/checkpoints/model-30000'
 
     batch_size = 128
     # val_dir = './data/val_data'
