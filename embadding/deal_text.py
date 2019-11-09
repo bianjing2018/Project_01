@@ -10,7 +10,7 @@ def cut(sentence):
 
 
 def stop_word(words):
-    with open('../static/stopwords', 'r') as fr:
+    with open('/root/project/Project_01//static/stopwords', 'r') as fr:
         stopwords = fr.readlines()
 
     stopwords = [word.replace('\n', '') for word in stopwords ]

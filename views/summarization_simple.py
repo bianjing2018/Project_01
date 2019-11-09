@@ -12,8 +12,7 @@ from embadding.base_function import cosine_similar
 from sklearn.metrics.pairwise import cosine_similarity
 """https://www.zhongxiaoping.cn/2019/02/25/SIF%E7%AE%97%E6%B3%95%E8%A7%A3%E6%9E%90/#wu-sif-suan-fa-dai-ma-bu-zou sif算法解析"""
 
-WORD_VECTOR = '/Users/haha/Desktop/Project_01/static/save_file/save_mode2'
-
+WORD_VECTOR = '/root/project/Project_01/static/save_file/save_mode2'
 
 class TextRankSummarization:
     """

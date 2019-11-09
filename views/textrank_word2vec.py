@@ -6,7 +6,7 @@ from itertools import product, count
 from gensim.models import word2vec
 import numpy as np
 
-model = word2vec.Word2Vec.load("/Users/haha/Desktop/Project_01/static/save_file/save_mode2")
+model = word2vec.Word2Vec.load("/root/project/Project_01/static/save_file/save_mode2")
 np.seterr(all='warn')
 
 
@@ -23,7 +23,7 @@ def cut_sentences(sentence):
 
 # 句子中的stopwords
 def create_stopwords():
-    stop_list = [line.strip() for line in open("/Users/haha/Desktop/Project_01/static/stopwords", 'r', encoding='utf-8').readlines()]
+    stop_list = [line.strip() for line in open("../static/stopwords", 'r', encoding='utf-8').readlines()]
     return stop_list
 
 

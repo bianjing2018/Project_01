@@ -130,7 +130,7 @@ class ParseDepend:
     """
     sentences: ["a b c", "d, e, f"]
     """
-    def __init__(self, path='../ltp_data', sentences=[]):
+    def __init__(self, path='/root/ltp_data', sentences=[]):
         self.LTP_DATA_DIR = path  # ltp模型目录的路径
         self.arcs = None
         self.sentences = sentences
