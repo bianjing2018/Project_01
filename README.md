@@ -1,15 +1,14 @@
 # Project_01
 
 
-每个人创建自己的分支每次合并到develop(不要直接合并到master分支)
-
-例如：
-
-    git checkout -b your_branch_name
+文本摘要技术总结
+    文档 -- 文档分析与处理 -- 计算文本单元的相似度 -- 根据相似度排序 -- 去除top n 作为摘要内容
     
-    "coding something change"
-    git add .
-    git commit -m '做了一些更改'
-    git push origin your_branch_name
-
-注：每次其他人提交代码之后都要在自己的分支上执行 git pull origin master
+    MMR = （alpha *(similar(sentence, doc_)) - (1 - alpha) * (1/n * 【sum(similar(sentenct,summary))】）
+           -------------------------------     -------------------------------------------------------
+           第一部分：每个句子和长文本的相似度        第二部分：句子和候选摘要集的相似度
+           物理意义：抽取句子和文本相似度            物理意义：减去当前句子和摘要集中相似度最高的句子（实现多样性）
+    第一部分可以使用texkrank替换，也可以用哪个sentence embedding的方式替换句子得分
+    句子编码可以用 index替换、Word embedding (可以使用tf-idf做加权平均)
+    
+    
