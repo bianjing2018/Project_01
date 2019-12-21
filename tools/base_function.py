@@ -4,7 +4,7 @@ from sklearn.decomposition import PCA
 import gensim
 from tools.deal_text import cut
 from collections import Counter
-
+import pandas as pd
 
 if os.path.exists('/root/flag_server'):
     WORD_VECTOR = '/root/project/Project_01/static/save_file/save_mode2'
@@ -23,6 +23,7 @@ def cosine_similar(vocter1, vocter2):
     return up / down
 
 def sentence_to_vec(corpus, sentence_list, W2V_MODEL, embedding_size=128, a: float = 1e-3):
+    # sif sentence embedding
     sentence_set = []
     words = cut(corpus)
     counters = Counter(words)
@@ -67,3 +68,11 @@ def sentence_to_vec(corpus, sentence_list, W2V_MODEL, embedding_size=128, a: flo
         sub = np.multiply(u, vs)
         sentence_vecs.append(np.subtract(vs, sub))
     return sentence_vecs
+
+
+def save_to_csv(file_path=None, save_path=None, header= None, encoding='utf-8'):
+    with open(file_path, 'r') as fr:
+        lines = fr.readlines()
+    lines = [line.replace('\n', '') for line in lines]
+    df = pd.DataFrame(lines)
+    df.to_csv(save_path, encoding=encoding, header=header)
